@@ -16,11 +16,31 @@ export function isUserRejection(e: unknown): boolean {
   return false;
 }
 
+/** `code` when the error carries no detail, so the chain reads as one line. */
+function described(e: unknown): string | undefined {
+  if (typeof e !== "object" || e === null) return undefined;
+  const { code, details, message } = e as {
+    code?: unknown;
+    details?: Record<string, unknown>;
+    message?: unknown;
+  };
+  const detail = Object.entries(details ?? {})
+    .filter(([key]) => key !== "method")
+    .map(([, value]) => String(value))
+    .join(" ");
+  if (typeof code === "string") return detail ? `${code} ${detail}` : code;
+  return typeof message === "string" ? message : undefined;
+}
+
+/** Every code and detail down the cause chain, outermost first. */
 export function errorMessage(e: unknown): string {
-  if (e instanceof RingError) {
-    const detail = e.details?.message;
-    if (typeof detail === "string") return detail;
+  const parts: string[] = [];
+  for (let cause = e, depth = 0; cause !== undefined && cause !== null && depth < 6; depth++) {
+    const part = described(cause);
+    if (part && !parts.includes(part)) parts.push(part);
+    cause = (cause as { cause?: unknown }).cause;
   }
+  if (parts.length > 0) return parts.join(", ");
   return e instanceof Error ? e.message : String(e);
 }
 

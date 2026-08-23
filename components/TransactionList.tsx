@@ -1,5 +1,6 @@
 "use client";
 
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { SkippedRingTransaction } from "@heliuslabs/zolana/ring";
 import { matches, type ShownTransaction } from "@/lib/transactions";
@@ -41,7 +42,7 @@ export function TransactionList({
         {pages > 1 && (
           <div className="flex items-center gap-2 text-xs text-muted">
             <IconButton title="previous page" onClick={() => setPage(current - 1)} disabled={current === 0}>
-              ‹
+              <CaretLeft size={14} weight="bold" />
             </IconButton>
             <span className="tabular-nums">
               {current + 1} / {pages}
@@ -51,7 +52,7 @@ export function TransactionList({
               onClick={() => setPage(current + 1)}
               disabled={current >= pages - 1}
             >
-              ›
+              <CaretRight size={14} weight="bold" />
             </IconButton>
           </div>
         )}

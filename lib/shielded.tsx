@@ -10,6 +10,7 @@ import {
   createZolanaClient,
   syncWallet,
 } from "@heliuslabs/zolana";
+import { buildRegistrationTransaction, fetchUserRecord } from "@heliuslabs/zolana/wallet";
 import {
   ShieldedAddress,
   ShieldedKeypair,
@@ -21,6 +22,7 @@ import {
   buildRingDepositTransaction,
   buildRingLookupTableTransaction,
   buildRingTransferTransaction,
+  buildRingWithdrawalTransaction,
 } from "@heliuslabs/zolana/ring";
 import { connectedAddress, sendTransaction, walletAddress } from "./chain";
 import { INDEXER_URL, PROVER_URL, SOLANA_RPC_URL, TREE, type Ring } from "./config";
@@ -34,6 +36,7 @@ export interface Synced {
   readonly wallet: Wallet;
   readonly slot: bigint;
   readonly viewingPublicKey: Uint8Array;
+  readonly client: ZolanaClient;
 }
 
 /** Derived once per wallet connection, the wallet signs one time. */
@@ -45,6 +48,14 @@ export interface Shielded {
   refresh(ring: Address): Promise<bigint>;
   deposit(ring: Address, lamports: bigint): Promise<string>;
   transfer(ring: Ring, lamports: bigint, recipient: Recipient): Promise<string>;
+  /** Value leaves the ring in the clear, for a recipient with no registry record. */
+  withdraw(ring: Ring, lamports: bigint, recipient: Address): Promise<string>;
+  /** Whether a Solana address can receive a shielded note. */
+  registered(recipient: Address): Promise<boolean>;
+  /** True with no registry record, false with one, undefined before the first sync. */
+  readonly unregistered: boolean | undefined;
+  /** Publishes this wallet's shielded keys so its Solana address is payable. */
+  register(): Promise<string>;
   /** A transfer to a key nobody holds. */
   burn(ring: Ring, lamports: bigint): Promise<string>;
 }
@@ -75,6 +86,7 @@ export function ShieldedProvider({ children }: { children: ReactNode }) {
   const wallet = useWallet();
   const address = walletAddress(wallet);
   const [session, setSession] = useState<Session>();
+  const [unregistered, setUnregistered] = useState<boolean>();
   const current = session?.wallet === address ? session : undefined;
   const clientRef = useRef<Promise<ZolanaClient>>(undefined);
   const derivedRef = useRef<Derived>(undefined);
@@ -117,7 +129,16 @@ export function ShieldedProvider({ children }: { children: ReactNode }) {
     const c = await client();
     const slot = BigInt(await c.solanaRpc.getSlot().send());
     await syncWallet({ client: c, wallet: shielded, authority, config: { requireSlot: slot } });
-    return { wallet: shielded, slot, viewingPublicKey: shielded.identity.viewingPublicKey.toBytes() };
+    const record = await fetchUserRecord({ rpc: c, owner: authority.solanaPublicKey() }).catch(
+      () => undefined,
+    );
+    setUnregistered(record === undefined);
+    return {
+      wallet: shielded,
+      slot,
+      viewingPublicKey: shielded.identity.viewingPublicKey.toBytes(),
+      client: c,
+    };
   }, [client, shieldedWallet]);
 
   const refresh = useCallback(
@@ -176,6 +197,51 @@ export function ShieldedProvider({ children }: { children: ReactNode }) {
     [client, refresh, shieldedWallet, wallet],
   );
 
+  const registered = useCallback(
+    async (recipient: Address) => (await fetchUserRecord({ rpc: await client(), owner: recipient })) !== undefined,
+    [client],
+  );
+
+  const withdraw = useCallback(
+    async (ring: Ring, lamports: bigint, recipient: Address) => {
+      const { authority, shielded, owner } = await shieldedWallet();
+      const c = await client();
+      await refresh(ring.id);
+      const signature = await sendTransaction(
+        wallet,
+        await buildRingWithdrawalTransaction({
+          client: c,
+          ringProgramId: ring.id,
+          wallet: shielded,
+          authority,
+          feePayer: owner,
+          recipient,
+          amount: lamports,
+          lookupTable: await lookupTable(c, ring, wallet),
+        }),
+      );
+      await refresh(ring.id);
+      return signature;
+    },
+    [client, refresh, shieldedWallet, wallet],
+  );
+
+  const register = useCallback(async () => {
+    const { authority, owner } = await shieldedWallet();
+    const transaction = await buildRegistrationTransaction({
+      client: await client(),
+      owner,
+      address: await authority.shieldedAddress(),
+    });
+    if (transaction === undefined) {
+      setUnregistered(false);
+      return "already registered";
+    }
+    const signature = await sendTransaction(wallet, transaction);
+    setUnregistered(false);
+    return signature;
+  }, [client, shieldedWallet, wallet]);
+
   const burn = useCallback(
     (ring: Ring, lamports: bigint) => transfer(ring, lamports, freshRecipient()),
     [transfer],
@@ -189,9 +255,25 @@ export function ShieldedProvider({ children }: { children: ReactNode }) {
       refresh,
       deposit,
       transfer,
+      withdraw,
+      registered,
+      unregistered,
+      register,
       burn,
     }),
-    [current?.balance, current?.address, sync, refresh, deposit, transfer, burn],
+    [
+      current?.balance,
+      current?.address,
+      sync,
+      refresh,
+      deposit,
+      transfer,
+      withdraw,
+      registered,
+      unregistered,
+      register,
+      burn,
+    ],
   );
   return <ShieldedContext.Provider value={value}>{children}</ShieldedContext.Provider>;
 }

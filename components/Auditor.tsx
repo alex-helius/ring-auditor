@@ -1,7 +1,7 @@
 "use client";
 
 import { ringStore } from "@/lib/rings";
-import { ringRpcUrl, selectedRing } from "@/lib/config";
+import { RING_RPC_URL, selectedRing } from "@/lib/config";
 import { useStored } from "@/lib/hooks";
 import { passkeyStore } from "@/lib/passkeys";
 import { ShieldedProvider } from "@/lib/shielded";
@@ -17,7 +17,7 @@ export default function Auditor() {
     <ShieldedProvider>
       <RingCard selection={selection} ring={ring} onChange={setSelection} />
       <Passkeys ring={ring?.id} passkeys={passkeys} onChange={setPasskeys} />
-      <ReadPanel ring={ring?.id} rpcUrl={ringRpcUrl(ring)} passkeys={passkeys} />
+      <ReadPanel ring={ring?.id} rpcUrl={RING_RPC_URL} passkeys={passkeys} />
     </ShieldedProvider>
   );
 }

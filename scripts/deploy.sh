@@ -12,8 +12,9 @@
 #
 # Needs aws (with write access), docker, jq, git.
 #
-# Environment, defaults from .env.deploy. `up` looks the ring RPC and prover up
-# in CloudFront (the zolana-rings-test stack) and rewrites those two lines.
+# Environment, defaults from .env.deploy. `up` looks the ring RPC, the prover
+# and the indexer up in CloudFront (the zolana-rings-test stack) and rewrites
+# those three lines.
 #   RING_RPC_URL, PROVER_URL, INDEXER_URL, SOLANA_RPC_URL, ZOLANA_TREE
 #   AWS_REGION          default eu-north-1
 #   DEPLOY_VPC          VPC id, default the account's default VPC
@@ -98,6 +99,11 @@ ensure_load_balancer() {
         arn="$(aws_ elbv2 create-load-balancer --name "$load_balancer" --type network --scheme internet-facing \
             --subnets "${subnet_list[@]}" --tags "$tag_spec" --query 'LoadBalancers[0].LoadBalancerArn' --output text)"
     fi
+    # One task runs in one zone, so the nodes of the other zones have no target.
+    # Without cross-zone they accept the connection and never answer, and two of
+    # the three balancer addresses time out.
+    aws_ elbv2 modify-load-balancer-attributes --load-balancer-arn "$arn" \
+        --attributes Key=load_balancing.cross_zone.enabled,Value=true >/dev/null
     group="$(aws_ elbv2 describe-target-groups --names "$prefix" --query 'TargetGroups[0].TargetGroupArn' --output text 2>/dev/null || true)"
     if [[ "$group" == None || -z "$group" ]]; then
         group="$(aws_ elbv2 create-target-group --name "$prefix" --protocol TCP --port "$container_port" --vpc-id "$vpc" \
@@ -189,13 +195,19 @@ ensure_service() {
     fi
 }
 
-# The hosted ring RPC and prover are the zolana-rings-test distributions.
+# The ring RPC, the prover and the indexer are the zolana-rings-test
+# distributions. The page is served over HTTPS, so every one of them has to be,
+# or the browser blocks the read as mixed content.
 resolve_service_urls() {
     local name host var
-    for name in ring-rpc prover; do
+    for name in ring-rpc prover indexer; do
         host="$(aws_ cloudfront list-distributions --query "DistributionList.Items[?Comment=='zolana-rings-test-$name'].DomainName | [0]" --output text 2>/dev/null || true)"
         [[ "$host" != None && -n "$host" ]] || { log "no zolana-rings-test-$name distribution, deploy the zolana ring test stack first"; exit 1; }
-        var=RING_RPC_URL; [[ "$name" == ring-rpc ]] || var=PROVER_URL
+        case "$name" in
+            ring-rpc) var=RING_RPC_URL ;;
+            prover) var=PROVER_URL ;;
+            *) var=INDEXER_URL ;;
+        esac
         export "$var=https://$host"
         sed -i.bak "s#^$var=.*#$var=https://$host#" .env.deploy && rm -f .env.deploy.bak
     done

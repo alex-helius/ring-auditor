@@ -12,11 +12,14 @@ importers:
   .:
     dependencies:
       '@heliuslabs/zolana':
-        specifier: github:helius-labs/zolana#f395d00d030e9bef99b91dc2b6bc2ddf0753f33f&path:sdk-libs/ts
-        version: https://codeload.github.com/helius-labs/zolana/tar.gz/f395d00d030e9bef99b91dc2b6bc2ddf0753f33f#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
+        specifier: github:alex-helius/zolana#707cc5c6&path:sdk-libs/ts
+        version: https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
       '@noble/curves':
         specifier: ^2.3.0
         version: 2.3.0
+      '@phosphor-icons/react':
+        specifier: ^2.1.10
+        version: 2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@scure/base':
         specifier: ^2.3.0
         version: 2.3.0
@@ -212,8 +215,8 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@heliuslabs/zolana@https://codeload.github.com/helius-labs/zolana/tar.gz/f395d00d030e9bef99b91dc2b6bc2ddf0753f33f#path:sdk-libs/ts':
-    resolution: {path: sdk-libs/ts, tarball: https://codeload.github.com/helius-labs/zolana/tar.gz/f395d00d030e9bef99b91dc2b6bc2ddf0753f33f}
+  '@heliuslabs/zolana@https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6#path:sdk-libs/ts':
+    resolution: {path: sdk-libs/ts, tarball: https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6}
     version: 0.1.0
     engines: {node: '>=24'}
     peerDependencies:
@@ -515,6 +518,13 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@phosphor-icons/react@2.1.10':
+    resolution: {integrity: sha512-vt8Tvq8GLjheAZZYa+YG/pW7HDbov8El/MANW8pOAz4eGxrwhnbfrQZq0Cp4q8zBEu8NIhHdnr+r8thnfRSNYA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>= 16.8'
+      react-dom: '>= 16.8'
 
   '@react-native-async-storage/async-storage@1.24.0':
     resolution: {integrity: sha512-W4/vbwUOYOjco0x3toB8QCr7EjIP6nE9G7o8PMguvvjYT5Awg09lyV4enACRx4s++PPulBiBSjL0KTFx2u0Z/g==}
@@ -3587,7 +3597,7 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@heliuslabs/zolana@https://codeload.github.com/helius-labs/zolana/tar.gz/f395d00d030e9bef99b91dc2b6bc2ddf0753f33f#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))':
+  '@heliuslabs/zolana@https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))':
     dependencies:
       '@lightprotocol/hasher.rs': 0.2.1
       '@noble/ciphers': 2.3.0
@@ -3830,6 +3840,11 @@ snapshots:
       fastq: 1.20.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@phosphor-icons/react@2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
 
   '@react-native-async-storage/async-storage@1.24.0(react-native@0.87.0(@babel/core@7.29.7)(@types/react@19.2.18)(bufferutil@4.1.0)(react@19.2.8)(utf-8-validate@6.0.6))':
     dependencies:

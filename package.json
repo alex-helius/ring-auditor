@@ -12,8 +12,9 @@
     "read": "node --experimental-strip-types --no-warnings scripts/read.ts"
   },
   "dependencies": {
-    "@heliuslabs/zolana": "github:helius-labs/zolana#f395d00d030e9bef99b91dc2b6bc2ddf0753f33f&path:sdk-libs/ts",
+    "@heliuslabs/zolana": "github:alex-helius/zolana#707cc5c6&path:sdk-libs/ts",
     "@noble/curves": "^2.3.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@scure/base": "^2.3.0",
     "@solana/kit": "^7.1.1",
     "@solana/wallet-adapter-base": "^0.9.27",
