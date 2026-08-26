@@ -5,10 +5,10 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
 import type { Address } from "@solana/kit";
 import {
-  RING_READER_COMPUTE_UNIT_LIMIT,
-  grantReaderInstruction,
+  RING_READ_ACCESS_COMPUTE_UNIT_LIMIT,
+  grantReadAccessInstruction,
   parseReaderKey,
-  revokeReaderInstruction,
+  revokeReadAccessInstruction,
 } from "@heliuslabs/zolana/ring";
 import { sendInstruction, walletAddress } from "@/lib/chain";
 import { useAction, useLoaded, useRefreshToken } from "@/lib/hooks";
@@ -65,14 +65,14 @@ export function Passkeys({
       if (!ring || !authority) throw new Error("connect the authority wallet first");
       const reader = parseReaderKey(readerText);
       const instruction = revoke
-        ? await revokeReaderInstruction({
+        ? await revokeReadAccessInstruction({
             ringProgramId: ring,
             authority,
             reader,
             rentRecipient: authority,
           })
-        : await grantReaderInstruction({ ringProgramId: ring, payer: authority, authority, reader });
-      await sendInstruction(wallet, instruction, RING_READER_COMPUTE_UNIT_LIMIT);
+        : await grantReadAccessInstruction({ ringProgramId: ring, payer: authority, authority, reader });
+      await sendInstruction(wallet, instruction, RING_READ_ACCESS_COMPUTE_UNIT_LIMIT);
       setPasted("");
       reload();
     });

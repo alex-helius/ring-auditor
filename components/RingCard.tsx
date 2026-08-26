@@ -167,7 +167,6 @@ function RingHealth({ ring, rpcUrl }: { ring: Address; rpcUrl: string }) {
 }
 
 function RingState({ status }: { status: RingStatus }) {
-  const key = <Key value={toHex(status.auditorPublicKey.toBytes())} />;
   switch (status.state) {
     case "served":
       return (
@@ -181,7 +180,7 @@ function RingState({ status }: { status: RingStatus }) {
       return (
         <div className="flex flex-col gap-1">
           <Badge>no config yet</Badge>
-          <Hint>The ring has no config on chain. `just init` pins this service&apos;s key.</Hint>
+          <Hint>The ring has no config on chain. `zolana-ring init` pins this service&apos;s key.</Hint>
         </div>
       );
     case "foreignAuditor":
@@ -195,8 +194,8 @@ function RingState({ status }: { status: RingStatus }) {
             ) : (
               <span className="text-muted">unknown</span>
             )}
-            <span className="text-xs text-muted">this service holds</span>
-            {key}
+            <span className="text-xs text-muted">service</span>
+            <Key value={status.servicePublicKey} />
           </div>
           <Hint>
             The config pins a key this service does not hold, and it cannot change, so no read of

@@ -75,6 +75,14 @@ export function TransactionCard({ tx }: { tx: ShownTransaction }) {
                 ) : (
                   <span className="text-muted">—</span>
                 )}
+                {output.exited && (
+                  <span
+                    className="ml-1 rounded-full border border-accent/60 bg-accent-ground px-2 py-0.5 text-accent"
+                    title="this note went to the default ring"
+                  >
+                    left the ring
+                  </span>
+                )}
               </td>
               <td className="py-1">
                 {isSol(output.asset) ? "SOL" : <Address value={output.asset} token />}

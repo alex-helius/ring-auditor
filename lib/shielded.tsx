@@ -146,7 +146,7 @@ export function ShieldedProvider({ children }: { children: ReactNode }) {
       const { wallet: shielded } = await sync();
       const total = shielded
         .utxos()
-        .filter((e) => !e.spent && e.utxo.asset === SOL_MINT && e.utxo.zoneProgramId === ring)
+        .filter((e) => !e.spent && e.utxo.asset === SOL_MINT && e.utxo.ringProgramId === ring)
         .reduce((sum, e) => sum + e.utxo.amount, 0n);
       setSession((prev) => (prev && prev.wallet === address ? { ...prev, balance: total } : prev));
       return total;

@@ -3,21 +3,26 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { isAddress } from "@solana/kit";
-import { RING_RPC_URL, type Ring } from "@/lib/config";
+import { INSTALL_URL, RING_RPC_URL, type Ring } from "@/lib/config";
 import { Button, Code, Field, Hint, Modal } from "./ui";
 
-/** `just ring-new` in the checkout generates the ring, the ring's own recipes deploy it. */
+/** The installer puts `zolana-ring` and `zolana` on PATH, the ring directory holds ring.toml and the keys. */
 const STEPS: readonly { readonly text?: string; readonly code: string }[] = [
   {
-    code: "git clone https://github.com/helius-labs/zolana",
+    text: "Install the ring operator CLI and the zolana CLI.",
+    code: `curl -fsSL ${INSTALL_URL} | sh`,
   },
   {
-    text: "Generate a ring and answer the wizard. It prints the program id it pinned, that is the ring address.",
-    code: "cd zolana\njust ring-new",
+    text: "Deploying the ring program needs the Anza CLI on PATH.",
+    code: 'sh -c "$(curl -sSfL https://release.anza.xyz/v4.0.2/install)"',
   },
   {
-    text: "In the generated ring, point it at devnet, then build, deploy, create the config, start the ring RPC and run one audited transfer.",
-    code: "cd <the generated ring>\njust devnet\njust pipeline",
+    text: "Generate a ring and answer the questions. It prints the program id it fixed, that is the ring address.",
+    code: "zolana-ring new",
+  },
+  {
+    text: "In the generated ring, point it at devnet, then deploy the program, create the config and run one audited transfer.",
+    code: "cd <the generated ring>\nzolana-ring devnet\nzolana-ring pipeline",
   },
 ];
 
@@ -57,7 +62,7 @@ export function Setup({ onAdd, onClose }: { onAdd: (ring: Ring) => void; onClose
           value={id}
           onChange={(e) => setId(e.target.value)}
           onKeyDown={enter}
-          placeholder="the address just ring-new printed"
+          placeholder="the address zolana-ring new printed"
         />
         <div className="flex justify-end">
           <Button onClick={submit}>Add ring</Button>
@@ -77,8 +82,8 @@ export function Setup({ onAdd, onClose }: { onAdd: (ring: Ring) => void; onClose
           ))}
         </ol>
         <Hint>
-          Then paste the program id above. The ring RPC that `just pipeline` starts must allow this
-          origin, set RING_RPC_ALLOW_ORIGINS in the ring before it runs.
+          Then paste the program id above. The ring RPC derives one auditor key per ring, so it
+          serves a new ring with no restart. It answers only the pages RING_RPC_ALLOW_ORIGINS names.
         </Hint>
       </div>
     </Modal>

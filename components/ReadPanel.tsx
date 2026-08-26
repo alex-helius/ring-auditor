@@ -129,11 +129,14 @@ export function ReadPanel({
         undecryptableSlots: item.undecryptableSlots,
         nullifiers: item.nullifiers,
         ...(item.withdrawals.length === 0 ? {} : { withdrawals: item.withdrawals }),
+        // A note that stays in the ring names it, one sent to the default ring
+        // names nothing.
         outputs: item.outputs.map((output) => ({
           slotIndex: output.slotIndex,
           recipient: addressDecoder.decode(output.ownerTag),
           asset: output.asset,
           amount: output.amount,
+          exited: output.ringProgramId === undefined,
         })),
       } satisfies ShownTransaction;
     });

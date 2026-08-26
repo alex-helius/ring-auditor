@@ -26,7 +26,7 @@ export function GrantRequest({ label, readerKey }: { label: string; readerKey: s
           <Copyable label="Reader key" value={readerKey} />
           <Copyable
             label="What the operator runs in the ring repository"
-            value={`just grant-reader ${readerKey}`}
+            value={`zolana-ring reader grant ${readerKey}`}
           />
           <Hint>
             An operator with the authority wallet can also open this page and grant the key from the

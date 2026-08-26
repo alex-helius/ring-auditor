@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@heliuslabs/zolana':
-        specifier: github:alex-helius/zolana#707cc5c6&path:sdk-libs/ts
-        version: https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
+        specifier: github:helius-labs/zolana#alex/custom-rings-v3&path:sdk-libs/ts
+        version: https://codeload.github.com/helius-labs/zolana/tar.gz/cd496229ac8dfa3f116b6bb60aa77615d29f4c64#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
       '@noble/curves':
         specifier: ^2.3.0
         version: 2.3.0
@@ -215,8 +215,8 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@heliuslabs/zolana@https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6#path:sdk-libs/ts':
-    resolution: {path: sdk-libs/ts, tarball: https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6}
+  '@heliuslabs/zolana@https://codeload.github.com/helius-labs/zolana/tar.gz/cd496229ac8dfa3f116b6bb60aa77615d29f4c64#path:sdk-libs/ts':
+    resolution: {path: sdk-libs/ts, tarball: https://codeload.github.com/helius-labs/zolana/tar.gz/cd496229ac8dfa3f116b6bb60aa77615d29f4c64}
     version: 0.1.0
     engines: {node: '>=24'}
     peerDependencies:
@@ -3597,7 +3597,7 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@heliuslabs/zolana@https://codeload.github.com/alex-helius/zolana/tar.gz/707cc5c6#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))':
+  '@heliuslabs/zolana@https://codeload.github.com/helius-labs/zolana/tar.gz/cd496229ac8dfa3f116b6bb60aa77615d29f4c64#path:sdk-libs/ts(@solana/kit@7.1.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))':
     dependencies:
       '@lightprotocol/hasher.rs': 0.2.1
       '@noble/ciphers': 2.3.0

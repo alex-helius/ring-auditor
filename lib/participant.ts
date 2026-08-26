@@ -25,7 +25,7 @@ export async function withdrawalRecipients(synced: Synced, ring?: Address): Prom
         ...new Set(
           synced.wallet
             .utxos()
-            .flatMap((entry) => (entry.utxo.zoneProgramId ? [entry.utxo.zoneProgramId] : [])),
+            .flatMap((entry) => (entry.utxo.ringProgramId ? [entry.utxo.ringProgramId] : [])),
         ),
       ];
   const rows = synced.wallet
@@ -103,7 +103,7 @@ export function participantViews(
   const ringLeaves = new Set(
     synced.wallet
       .utxos()
-      .filter((entry) => entry.utxo.zoneProgramId === ring)
+      .filter((entry) => entry.utxo.ringProgramId === ring)
       .map((entry) => entry.outputContext.leafIndex),
   );
   const onRing = (signature: string) =>
@@ -116,7 +116,7 @@ export function participantViews(
   }
   const ownNotes = new Map<string, number>();
   for (const entry of synced.wallet.utxos()) {
-    if (entry.utxo.zoneProgramId !== ring) continue;
+    if (entry.utxo.ringProgramId !== ring) continue;
     const row = authored.get(entry.outputContext.leafIndex);
     if (row) ownNotes.set(row.id.signature, (ownNotes.get(row.id.signature) ?? 0) + 1);
   }
@@ -127,11 +127,14 @@ export function participantViews(
 
   const received = new Map<string, ShownTransaction>();
   for (const entry of synced.wallet.utxos()) {
-    if (entry.utxo.zoneProgramId !== ring) continue;
     const leaf = entry.outputContext.leafIndex;
     const historic = byLeaf.get(leaf);
     const row = historic ?? authored.get(leaf);
     if (!row) continue;
+    // A transfer can send one note to the default ring and keep its change here,
+    // so a note that names no ring still belongs to this ring's history.
+    const exited = entry.utxo.ringProgramId === undefined && onRing(row.id.signature);
+    if (entry.utxo.ringProgramId !== ring && !exited) continue;
     if (!historic && !selfPaid(row.id.signature)) continue;
     // A deposit is the wallet paying itself in, so it has no counterparty.
     const sender = row.kind === "deposit" ? undefined : historic ? other(row.id.signature) : wallet;
@@ -144,6 +147,7 @@ export function participantViews(
         asset: entry.utxo.asset,
         amount: entry.utxo.amount,
         spent: entry.spent,
+        exited,
       },
       { signers: [], ...(sender === undefined ? {} : { sender }), deposit: row.kind === "deposit" },
     );

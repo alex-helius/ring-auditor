@@ -8,6 +8,10 @@ export const INDEXER_URL = process.env.NEXT_PUBLIC_INDEXER_URL ?? "http://127.0.
 export const PROVER_URL = process.env.NEXT_PUBLIC_PROVER_URL ?? "http://127.0.0.1:3701";
 export const TREE = (process.env.NEXT_PUBLIC_ZOLANA_TREE ??
   "trEEbaNobcTESNmtsPBj3FX27q5sDCQePV2kb12FYho") as Address;
+// This page serves the installer from its own `public`, the default names the
+// deployment so a copied snippet works anywhere.
+export const INSTALL_URL =
+  process.env.NEXT_PUBLIC_INSTALL_URL ?? "https://d18al5hkzw7b42.cloudfront.net/install.sh";
 
 export interface Ring {
   readonly name: string;

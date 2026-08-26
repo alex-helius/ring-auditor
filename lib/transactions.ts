@@ -7,6 +7,8 @@ export interface ShownOutput {
   readonly asset: string;
   readonly amount: bigint;
   readonly spent?: boolean;
+  /** The note this slot made left the ring for the default ring. */
+  readonly exited?: boolean;
 }
 
 /** A public settlement leg, so value that left the ring in the clear. */
@@ -43,6 +45,7 @@ export function searchText(tx: ShownTransaction): string {
       o.asset,
       o.amount.toString(),
       formatAmount(o.amount, o.asset),
+      o.exited ? "left the ring" : "",
     ]),
     ...tx.nullifiers.map(toBase58),
   ]
